@@ -7,7 +7,7 @@ import com.rimelink.data.mqtt.Client;
 public class demoRowaMqtt {
 
     public static void main(String[] args) throws Exception{
-        Client client = new Client("lorawan.timeddd.com", "36", "3c83e380-a393-4301-ab93-62c16159b04e");
+        Client client = new Client("lorawan.timeddd.com", "36", "");
 
         client.onMessage((String devEUI, UplinkMessage data) -> {
             try {
