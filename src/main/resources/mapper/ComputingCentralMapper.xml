@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.ComputingCentralMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.entity.ComputingCentral">
+        <id column="central_id" property="centralId" />
+        <result column="central_name" property="centralName" />
+        <result column="cpu_consumption" property="cpuConsumption" />
+        <result column="mem_consumption" property="memConsumption" />
+        <result column="total" property="total" />
+        <result column="used" property="used" />
+        <result column="free" property="free" />
+        <result column="present" property="present" />
+        <result column="time" property="time" />
+    </resultMap>
+
+</mapper>
