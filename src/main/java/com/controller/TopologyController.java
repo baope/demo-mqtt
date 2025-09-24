@@ -5,12 +5,9 @@ import com.entity.Topology;
 import com.mapper.TopologyMapper;
 import com.service.TopologyService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
@@ -28,10 +25,10 @@ public class TopologyController {
     TopologyService topologyService;
 
 
+
+
     @PostMapping("add")
-    public void TopologyAdd(){
-        Topology topology = new Topology();
-        topology.setName("<UNK>");
+    public void TopologyAdd(@RequestBody Topology topology) {
         topologyService.insertOne(topology);
         return;
     }
