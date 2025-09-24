@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.monitor;
 
 import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.client.MqttCallback;
