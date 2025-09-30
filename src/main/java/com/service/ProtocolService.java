@@ -1,16 +1,12 @@
 package com.service;
 
-import com.entity.Protocol;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.entity.Protocol;
 
-/**
- * <p>
- *  服务类
- * </p>
- *
- * @author cwj
- * @since 2025-09-24
- */
 public interface ProtocolService extends IService<Protocol> {
 
+    /**
+     * 插入协议数据
+     */
+    Integer insertProtocol(String protocolName, String value, Integer messageId);
 }

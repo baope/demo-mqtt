@@ -1,16 +1,12 @@
 package com.service;
 
-import com.entity.Message;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.entity.Message;
 
-/**
- * <p>
- *  服务类
- * </p>
- *
- * @author cwj
- * @since 2025-09-24
- */
 public interface MessageService extends IService<Message> {
 
+    /**
+     * 插入消息数据
+     */
+    Integer insertMessage(String value);
 }

@@ -1,7 +1,7 @@
 package com.service;
 
-import com.entity.ComputingCentral;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.entity.ComputingCentral;
 
 /**
  * <p>
@@ -12,5 +12,14 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2025-09-24
  */
 public interface ComputingCentralService extends IService<ComputingCentral> {
+    /**
+     * 插入计算中心数据（带随机值）
+     */
+    boolean insertComputingCentral(String centralName);
+
+    /**
+     * 批量插入测试数据
+     */
+    boolean batchInsertTestData(int count);
 
 }
