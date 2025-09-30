@@ -39,7 +39,7 @@ public class RowaMqttMonitor implements CommandLineRunner {
     private void startMqttClient() {
         try {
             // 创建MQTT客户端
-            Client client = new Client("lorawan.timeddd.com", "36", "3c83e380-a393-4301-ab93-62c16159b04e");
+            Client client = new Client("lorawan.timeddd.com", "36", "");
 
             // 设置消息接收回调
             client.onMessage((String devEUI, UplinkMessage data) -> {
