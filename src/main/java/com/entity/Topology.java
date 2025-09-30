@@ -26,13 +26,10 @@ public class Topology implements Serializable {
     @TableId(value = "topology_id", type = IdType.AUTO)
     private Integer topologyId;
 
-    private String name;
-
     private Integer edgeId;
 
     private Integer typeId;
 
     private LocalDateTime time;
-
 
 }

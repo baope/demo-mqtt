@@ -28,12 +28,12 @@ public class Edge implements Serializable {
     /**
      * computingCentral_id
      */
-    private Integer from;
+    private Integer fromCentral;
 
     /**
      * topology_id
      */
-    private Integer to;
+    private Integer toDevice;
 
 
 }

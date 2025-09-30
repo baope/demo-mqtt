@@ -30,6 +30,4 @@ public class Protocol implements Serializable {
     private String value;
 
     private Integer messageId;
-
-
 }
