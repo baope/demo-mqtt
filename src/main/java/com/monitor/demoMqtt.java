@@ -18,7 +18,7 @@ public class demoMqtt {
             MqttClient client = new MqttClient(broker, clientId);
             MqttConnectionOptions options = new MqttConnectionOptions();
             options.setUserName("thingidp@adtwuzp|industry-IOT013|0|MD5");
-            options.setPassword("57077824e2502e032d24164aad247fa0".getBytes());
+            options.setPassword("".getBytes());
 
             client.setCallback(new MqttCallback() {
                 public void connectComplete(boolean reconnect, String serverURI) {
