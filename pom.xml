@@ -13,6 +13,8 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>demo</name>
     <description>demo</description>
+    <packaging>war</packaging>
+
 
     <url/>
     <licenses>
@@ -47,14 +49,57 @@
             <url>https://repo.eclipse.org/content/repositories/paho-releases/</url>
         </repository>
     </repositories>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>2.19.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 
     <dependencies>
+
+        <dependency>
+
+            <groupId>rimelink</groupId>
+
+            <artifactId>java</artifactId>
+
+            <version>1.2.0</version>
+
+            <scope>system</scope>
+
+            <systemPath>${project.basedir}/lib/com.rimelink.data.mqtt.sdk-3.0.jar</systemPath>
+
+        </dependency>
+
+
+        <dependency>
+
+            <groupId>rimelink-paho</groupId>
+            <artifactId>java</artifactId>
+            <version>1.2.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/org.eclipse.paho.client.mqttv3-1.1.1.jar</systemPath>
+        </dependency>
+
 
 
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
             <version>3.5.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>${druid.version}</version>
         </dependency>
 
 
@@ -64,12 +109,6 @@
             <version>8.0.17</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.5.5</version>
-        </dependency>
 
 
         <dependency>
@@ -125,6 +164,12 @@
             <version>2.12.5</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+
 
 
         <dependency>
@@ -154,8 +199,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <includeSystemScope>true</includeSystemScope>
+                </configuration>
             </plugin>
         </plugins>
+
     </build>
 
 </project>

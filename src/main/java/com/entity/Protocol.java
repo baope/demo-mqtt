@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -32,5 +33,5 @@ public class Protocol implements Serializable {
 
     private Integer messageId;
 
-
+    private LocalDateTime timestamp;
 }

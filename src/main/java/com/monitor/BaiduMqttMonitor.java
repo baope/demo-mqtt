@@ -22,9 +22,10 @@ public class BaiduMqttMonitor implements CommandLineRunner {
     private static final String WATER_LEAK_SENSOR = "WaterImmersion";
     private static final String TEMPERATURE_SENSOR = "Temperature";
     private static final String HUMIDITY_SENSOR = "Humidity";
-    private static final String INFRARED_INTRUSION_SENSOR = "InfraredIntrusion";
+    private static final String SPACE = "InfraredIntrusion";
     private static final String CEILING_INFRARED_SENSOR = "CeilingInfrared";
     private static final String LIGHT_INTENSITY_SENSOR = "LLuxSenSor";
+
 
     @Override
     public void run(String... args) throws Exception {
@@ -76,7 +77,7 @@ public class BaiduMqttMonitor implements CommandLineRunner {
 
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
                     String payload = new String(message.getPayload());
-                    System.out.println("收到百度云MQTT消息: " + payload);
+                    System.out.println("payload: " + payload);
 
                     try {
                         ObjectMapper mapper = new ObjectMapper();
@@ -164,13 +165,13 @@ public class BaiduMqttMonitor implements CommandLineRunner {
                 String status = node.asText();
                 int code = "normal".equalsIgnoreCase(status.replace("!", "")) ? 0 : 1;
                 sensorValue = (double) code;
-                System.out.println("传感器: " + sensorName + " (" + sensorKey + "), 状态: " + status + ", Code: " + code);
+//                System.out.println("传感器: " + sensorName + " (" + sensorKey + "), 状态: " + status + ", Code: " + code);
             } else if (node.isNumber()) {
                 // 数值型（温度、湿度、光照等）- 直接存储原始值
                 sensorValue = node.asDouble();
-                System.out.println("传感器: " + sensorName + " (" + sensorKey + "), 数值: " + sensorValue);
+//                System.out.println("传感器: " + sensorName + " (" + sensorKey + "), 数值: " + sensorValue);
             } else {
-                System.out.println("传感器: " + sensorName + " (" + sensorKey + "), 不支持的类型: " + node.toString());
+//                System.out.println("传感器: " + sensorName + " (" + sensorKey + "), 不支持的类型: " + node.toString());
                 return;
             }
 
@@ -178,7 +179,7 @@ public class BaiduMqttMonitor implements CommandLineRunner {
             if (sensorValue != null) {
                 boolean success = topologyTypeService.saveSensorData(sensorName, sensorValue);
                 if (success) {
-                    System.out.println("✅ 百度云传感器数据保存成功: " + sensorName + " = " + sensorValue);
+//                    System.out.println("✅ 百度云传感器数据保存成功: " + sensorName + " = " + sensorValue);
                 } else {
                     System.err.println("❌ 百度云传感器数据保存失败: " + sensorName + " = " + sensorValue);
                 }
@@ -206,8 +207,8 @@ public class BaiduMqttMonitor implements CommandLineRunner {
                 return LIGHT_INTENSITY_SENSOR;
             case "PanicButton":
                 return EMERGENCY_BUTTON;
-            case "InfraredIntrusion":
-                return INFRARED_INTRUSION_SENSOR;
+            case "Space":
+                return SPACE;
             case "CeilingInfrared":
                 return CEILING_INFRARED_SENSOR;
             default:

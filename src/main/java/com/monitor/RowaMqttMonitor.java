@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+//@Component
 public class RowaMqttMonitor implements CommandLineRunner {
 
     @Autowired
@@ -23,6 +23,9 @@ public class RowaMqttMonitor implements CommandLineRunner {
         EUI_SENSOR_MAP.put("303235346442567e", "CO2");        // CO2传感器
         EUI_SENSOR_MAP.put("3032353464416f6e", "Vibration");  // 震动传感器
         EUI_SENSOR_MAP.put("303235346442527d", "Gas");        // 可燃气体传感器
+        EUI_SENSOR_MAP.put("3032353464414f6c", "Vibration_1");        // CO2传感器
+        EUI_SENSOR_MAP.put("303235346441676d", "CO2_1");  // 震动传感器
+        EUI_SENSOR_MAP.put("303235346441654b", "Gas_1");
     }
 
     @Override
@@ -46,7 +49,7 @@ public class RowaMqttMonitor implements CommandLineRunner {
                 try {
                     byte[] received = data.getData();
                     String hexData = bytesToHex(received);
-                    System.out.println("收到数据 - 设备EUI: " + devEUI + ", 原始数据: " + hexData);
+//                    System.out.println("收到数据 - 设备EUI: " + devEUI + ", 原始数据: " + hexData);
 
                     // 根据设备EUI获取传感器名称
                     String sensorName = EUI_SENSOR_MAP.get(devEUI);
@@ -77,7 +80,7 @@ public class RowaMqttMonitor implements CommandLineRunner {
                     }
 
                     // 保存到数据库（使用新的方法，包含原始数据）
-                    topologyTypeService.saveLoRaWanSensorData(sensorName, sensorValue, received);
+                    topologyTypeService.saveLoRaWanSensorData(sensorName, sensorValue, received,devEUI);
 
                     // 发送响应
                     System.out.println("向设备发送LED控制指令");

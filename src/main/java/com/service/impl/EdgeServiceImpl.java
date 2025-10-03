@@ -6,6 +6,7 @@ import com.entity.Edge;
 import com.mapper.ComputingCentralMapper;
 import com.mapper.EdgeMapper;
 import com.service.EdgeService;
+import com.service.ProtocolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ public class EdgeServiceImpl extends ServiceImpl<EdgeMapper, Edge>
 
     @Autowired
     private ComputingCentralMapper computingCentralMapper;
+
 
     @Override
     @Transactional

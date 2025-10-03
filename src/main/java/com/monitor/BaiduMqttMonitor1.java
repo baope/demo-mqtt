@@ -26,7 +26,7 @@ public class BaiduMqttMonitor1 implements CommandLineRunner {
     private static final String CEILING_INFRARED_SENSOR = "CeilingInfrared";
     private static final String LIGHT_INTENSITY_SENSOR = "LLuxSenSor";
 
-    @Override
+//    @Override
     public void run(String... args) throws Exception {
         // 在新线程中启动百度MQTT监控
         Thread monitorThread = new Thread(this::startBaiduMqttClient);
@@ -36,9 +36,9 @@ public class BaiduMqttMonitor1 implements CommandLineRunner {
     }
 
     private void startBaiduMqttClient() {
-        String broker = "tcp://adtwuzp.iot.gz.baidubce.com:1883";
+        String broker = "tcp://adtwuzp.iot.gz.baidubce.com";
         String clientId = "demo_client_" + System.currentTimeMillis();
-        String topic = "$iot/industry-IOT013/user/update";
+        String topic = "$iot/industry-IOT010/user/update";
         int subQos = 0;
 
         try {
@@ -76,7 +76,6 @@ public class BaiduMqttMonitor1 implements CommandLineRunner {
 
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
                     String payload = new String(message.getPayload());
-                    System.out.println("收到百度云MQTT消息: " + payload);
 
                     try {
                         ObjectMapper mapper = new ObjectMapper();
@@ -164,21 +163,21 @@ public class BaiduMqttMonitor1 implements CommandLineRunner {
                 String status = node.asText();
                 int code = "normal".equalsIgnoreCase(status.replace("!", "")) ? 0 : 1;
                 sensorValue = (double) code;
-                System.out.println("传感器: " + sensorName + " (" + sensorKey + "), 状态: " + status + ", Code: " + code);
+//                System.out.println("传感器: " + sensorName + " (" + sensorKey + "), 状态: " + status + ", Code: " + code);
             } else if (node.isNumber()) {
                 // 数值型（温度、湿度、光照等）- 直接存储原始值
                 sensorValue = node.asDouble();
-                System.out.println("传感器: " + sensorName + " (" + sensorKey + "), 数值: " + sensorValue);
+//                System.out.println("传感器: " + sensorName + " (" + sensorKey + "), 数值: " + sensorValue);
             } else {
-                System.out.println("传感器: " + sensorName + " (" + sensorKey + "), 不支持的类型: " + node.toString());
+//                System.out.println("传感器: " + sensorName + " (" + sensorKey + "), 不支持的类型: " + node.toString());
                 return;
             }
 
             // 保存到数据库
             if (sensorValue != null) {
-                boolean success = topologyTypeService.saveSensorData(sensorName, sensorValue);
+                boolean success = topologyTypeService.saveSensorData(sensorName+"_1", sensorValue);
                 if (success) {
-                    System.out.println("✅ 百度云传感器数据保存成功: " + sensorName + " = " + sensorValue);
+//                    System.out.println("✅ 百度云传感器数据保存成功: " + sensorName + " = " + sensorValue);
                 } else {
                     System.err.println("❌ 百度云传感器数据保存失败: " + sensorName + " = " + sensorValue);
                 }

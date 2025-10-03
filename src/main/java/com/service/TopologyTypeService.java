@@ -18,5 +18,5 @@ public interface TopologyTypeService extends IService<TopologyType> {
     /**
      * 保存LoRaWan传感器数据（包含原始数据和协议信息）
      */
-    boolean saveLoRaWanSensorData(String sensorName, Integer sensorValue, byte[] rawData);
+    boolean saveLoRaWanSensorData(String sensorName, Integer sensorValue, byte[] rawData,String devEUI);
 }

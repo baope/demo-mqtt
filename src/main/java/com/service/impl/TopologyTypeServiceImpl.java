@@ -1,6 +1,7 @@
 package com.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.common.CenterMap;
 import com.entity.Topology;
 import com.entity.TopologyType;
 import com.mapper.TopologyTypeMapper;
@@ -31,67 +32,7 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
     @Autowired
     private MessageService messageService;
 
-    // 传感器到中心的映射关系
-    private static final Map<String, String> SENSOR_CENTER_MAP = new HashMap<>();
-    static {
-        // 平台1的传感器映射（无后缀）
-        SENSOR_CENTER_MAP.put("CO2", "LoRaWan中心");
-        SENSOR_CENTER_MAP.put("Vibration", "LoRaWan中心");
-        SENSOR_CENTER_MAP.put("Gas", "LoRaWan中心");
 
-        // 平台2的传感器映射（带_1后缀）
-        SENSOR_CENTER_MAP.put("CO2_1", "LoRaWan中心1");
-        SENSOR_CENTER_MAP.put("Vibration_1", "LoRaWan中心1");
-        SENSOR_CENTER_MAP.put("Gas_1", "LoRaWan中心1");
-
-        // 百度平台1的传感器
-        SENSOR_CENTER_MAP.put("PanicButton", "WiFi中心");
-        SENSOR_CENTER_MAP.put("WaterImmersion", "WiFi中心");
-        SENSOR_CENTER_MAP.put("Temperature", "WiFi中心");
-        SENSOR_CENTER_MAP.put("Humidity", "WiFi中心");
-
-        // 百度平台2的传感器
-        SENSOR_CENTER_MAP.put("PanicButton_1", "WiFi中心1");
-        SENSOR_CENTER_MAP.put("WaterImmersion_1", "WiFi中心1");
-        SENSOR_CENTER_MAP.put("Temperature_1", "WiFi中心1");
-        SENSOR_CENTER_MAP.put("Humidity_1", "WiFi中心1");
-
-        // NB-IoT中心的传感器（英文名称）
-        SENSOR_CENTER_MAP.put("InfraredIntrusion", "NB-IoT中心");
-        SENSOR_CENTER_MAP.put("CeilingInfrared", "NB-IoT中心");
-        SENSOR_CENTER_MAP.put("LLuxSenSor", "NB-IoT中心");
-
-        SENSOR_CENTER_MAP.put("InfraredIntrusion_1", "NB-IoT中心1");
-        SENSOR_CENTER_MAP.put("CeilingInfrared_1", "NB-IoT中心1");
-        SENSOR_CENTER_MAP.put("LLuxSenSor_1", "NB-IoT中心1");
-    }
-
-    // 传感器到协议名称的映射
-    private static final Map<String, String> SENSOR_PROTOCOL_MAP = new HashMap<>();
-    static {
-        SENSOR_PROTOCOL_MAP.put("CO2", "二氧化碳传感器协议");
-        SENSOR_PROTOCOL_MAP.put("Vibration", "震动传感器协议");
-        SENSOR_PROTOCOL_MAP.put("Gas", "可燃气体传感器协议");
-    }
-
-    // 传感器解析规则
-    private static final Map<String, String> PROTOCOL_RULES = new HashMap<>();
-    static {
-        PROTOCOL_RULES.put("CO2",
-                "开始帧: FE, 结束帧: EF。开始帧后面的字节为硬件平台编号，第三个字节为数据长度，后面为有效数据。\n" +
-                        "二氧化碳传感器数据格式：第一个数据字节是 0xCA（传感器类型），第二个数据字节 00（模块编号），" +
-                        "第三和第四个数据字节为二氧化碳数据（16位，高8位在前，低8位在后）");
-
-        PROTOCOL_RULES.put("Vibration",
-                "开始帧: FE, 结束帧: EF。开始帧后面的字节为硬件平台编号，第三个字节为数据长度，后面为有效数据。\n" +
-                        "震动传感器数据格式：第一个数据字节是 0xC6（传感器类型），第二个数据字节 00（模块编号），" +
-                        "第三个数据字节代表单位时间内传感器触发的次数");
-
-        PROTOCOL_RULES.put("Gas",
-                "开始帧: FE, 结束帧: EF。开始帧后面的字节为硬件平台编号，第三个字节为数据长度，后面为有效数据。\n" +
-                        "可燃气体传感器数据格式：第一个数据字节是 0xC5（传感器类型），第二个数据字节 00（模块编号），" +
-                        "第三个数据字节代表单位时间内传感器触发的次数");
-    }
 
     @Override
     @Transactional
@@ -103,8 +44,6 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
     @Transactional
     public boolean saveSensorData(String sensorName, Double sensorValue) {
         try {
-            System.out.println("开始保存传感器数据: " + sensorName + " = " + sensorValue);
-
             // 1. 插入topologyType表
             TopologyType topologyType = new TopologyType();
             topologyType.setName(sensorName);
@@ -116,10 +55,8 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
                 return false;
             }
 
-            System.out.println("topologyType插入成功，typeId: " + topologyType.getTypeId());
-
             // 2. 根据传感器名称获取对应的中心名称
-            String centerName = SENSOR_CENTER_MAP.get(sensorName);
+            String centerName = CenterMap.SENSOR_CENTER_MAP.get(sensorName);
             if (centerName == null) {
                 throw new RuntimeException("未知的传感器类型: " + sensorName);
             }
@@ -130,7 +67,6 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
                 throw new RuntimeException("未找到中心: " + centerName);
             }
 
-            System.out.println("获取到中心ID: " + centerId + " for " + centerName);
 
             // 4. 根据传感器名称获取设备ID
             Integer deviceId = getDeviceIdBySensorName(sensorName);
@@ -138,7 +74,6 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
                 throw new RuntimeException("未找到设备: " + sensorName);
             }
 
-            System.out.println("获取到设备ID: " + deviceId + " for " + sensorName);
 
             // 5. 插入edge表，连接中心和设备
             Integer edgeId = edgeService.insertEdge(centerId, deviceId);
@@ -146,7 +81,6 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
                 throw new RuntimeException("插入edge表失败");
             }
 
-            System.out.println("edge插入成功，edgeId: " + edgeId);
 
             // 6. 插入topology表（连接edge表和topologyType表）
             Integer topologyId = insertTopologyRecord(edgeId, topologyType.getTypeId());
@@ -154,13 +88,7 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
                 throw new RuntimeException("插入topology表失败");
             }
 
-            System.out.println("topology插入成功，topologyId: " + topologyId);
-
             System.out.println("✅ 传感器数据保存成功: " + sensorName + " = " + sensorValue);
-            System.out.println("📊 生成记录 - topologyTypeId: " + topologyType.getTypeId() +
-                    ", deviceId: " + deviceId + ", edgeId: " + edgeId +
-                    ", topologyId: " + topologyId);
-
             return true;
 
         } catch (Exception e) {
@@ -172,9 +100,8 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
 
     @Override
     @Transactional
-    public boolean saveLoRaWanSensorData(String sensorName, Integer sensorValue, byte[] rawData) {
+    public boolean saveLoRaWanSensorData(String sensorName, Integer sensorValue, byte[] rawData,String devEUI) {
         try {
-            System.out.println("开始保存LoRaWan传感器数据: " + sensorName + " = " + sensorValue);
 
             // 1. 插入topologyType表
             TopologyType topologyType = new TopologyType();
@@ -187,10 +114,9 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
                 return false;
             }
 
-            System.out.println("topologyType插入成功，typeId: " + topologyType.getTypeId());
 
             // 2. 根据传感器名称获取对应的中心名称
-            String centerName = SENSOR_CENTER_MAP.get(sensorName);
+            String centerName = CenterMap.SENSOR_CENTER_MAP.get(sensorName);
             if (centerName == null) {
                 throw new RuntimeException("未知的传感器类型: " + sensorName);
             }
@@ -201,7 +127,7 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
                 throw new RuntimeException("未找到中心: " + centerName);
             }
 
-            System.out.println("获取到中心ID: " + centerId + " for " + centerName);
+
 
             // 4. 根据传感器名称获取设备ID
             Integer deviceId = getDeviceIdBySensorName(sensorName);
@@ -209,7 +135,6 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
                 throw new RuntimeException("未找到设备: " + sensorName);
             }
 
-            System.out.println("获取到设备ID: " + deviceId + " for " + sensorName);
 
             // 5. 插入edge表，连接中心和设备
             Integer edgeId = edgeService.insertEdge(centerId, deviceId);
@@ -217,7 +142,6 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
                 throw new RuntimeException("插入edge表失败");
             }
 
-            System.out.println("edge插入成功，edgeId: " + edgeId);
 
             // 6. 插入topology表（连接edge表和topologyType表）
             Integer topologyId = insertTopologyRecord(edgeId, topologyType.getTypeId());
@@ -225,20 +149,16 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
                 throw new RuntimeException("插入topology表失败");
             }
 
-            System.out.println("topology插入成功，topologyId: " + topologyId);
+//            System.out.println("topology插入成功，topologyId: " + topologyId);
 
             // 7. 解析原始数据并插入protocol和message表
-            boolean protocolSaved = insertProtocolAndMessage(sensorName, rawData);
+            boolean protocolSaved = insertProtocolAndMessage(sensorName, rawData,devEUI,"RowaLan");
             if (!protocolSaved) {
                 throw new RuntimeException("插入protocol和message表失败");
             }
 
-            System.out.println("protocol和message插入成功");
 
             System.out.println("✅ LoRaWan传感器数据保存成功: " + sensorName + " = " + sensorValue);
-            System.out.println("📊 生成记录 - topologyTypeId: " + topologyType.getTypeId() +
-                    ", deviceId: " + deviceId + ", edgeId: " + edgeId +
-                    ", topologyId: " + topologyId);
 
             return true;
 
@@ -270,6 +190,18 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
         sensorDeviceMap.put("CeilingInfrared", "吸顶红外入侵传感器");
         sensorDeviceMap.put("LLuxSenSor", "光照强度传感器");
 
+
+        sensorDeviceMap.put("CO2_1", "CO2传感器1");
+        sensorDeviceMap.put("Vibration_1", "震动传感器1");
+        sensorDeviceMap.put("Gas_1", "可燃气体传感器1");
+        sensorDeviceMap.put("PanicButton_1", "紧急按钮1");
+        sensorDeviceMap.put("WaterImmersion_1", "水浸传感器1");
+        sensorDeviceMap.put("Temperature_1", "温湿度传感器1");
+        sensorDeviceMap.put("Humidity_1", "温湿度传感器1");
+        sensorDeviceMap.put("InfraredIntrusion_1", "红外对射入侵传感器1");
+        sensorDeviceMap.put("CeilingInfrared_1", "吸顶红外入侵传感器1");
+        sensorDeviceMap.put("LLuxSenSor_1", "光照强度传感器1");
+
         String deviceName = sensorDeviceMap.get(sensorName);
         if (deviceName == null) {
             System.err.println("未找到传感器对应的设备: " + sensorName);
@@ -295,10 +227,17 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
     /**
      * 插入protocol和message表
      */
-    private boolean insertProtocolAndMessage(String sensorName, byte[] rawData) {
+    private boolean insertProtocolAndMessage(String sensorName, byte[] rawData,String devEUI,String centralName) {
         try {
+
+            String protocolName = CenterMap.SENSOR_PROTOCOL_MAP.get(sensorName);
+            if (protocolName == null) {
+                System.err.println("未找到传感器对应的协议信息: " + sensorName);
+                return false;
+            }
+
             // 1. 解析原始数据生成message内容
-            String messageContent = parseRawDataToMessage(rawData, sensorName);
+            String messageContent = parseRawDataToMessage(rawData, protocolName,devEUI);
 
             // 2. 插入message表
             Integer messageId = messageService.insertMessage(messageContent);
@@ -307,16 +246,10 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
             }
 
             // 3. 获取协议名称和规则
-            String protocolName = SENSOR_PROTOCOL_MAP.get(sensorName);
-            String protocolRule = PROTOCOL_RULES.get(sensorName);
-
-            if (protocolName == null || protocolRule == null) {
-                System.err.println("未找到传感器对应的协议信息: " + sensorName);
-                return false;
-            }
+            String hexData = bytesToHex(rawData);
 
             // 4. 插入protocol表
-            Integer protocolId = protocolService.insertProtocol(protocolName, protocolRule, messageId);
+            Integer protocolId = protocolService.insertProtocol(centralName, hexData, messageId);
             return protocolId != null;
 
         } catch (Exception e) {
@@ -329,7 +262,7 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
     /**
      * 解析原始数据生成message内容
      */
-    private String parseRawDataToMessage(byte[] rawData, String sensorName) {
+    private String parseRawDataToMessage(byte[] rawData, String sensorName,String devEUI) {
         StringBuilder messageBuilder = new StringBuilder();
 
         // 将字节数组转换为十六进制字符串
@@ -347,9 +280,11 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
         byte hardwarePlatform = rawData[1];
         byte dataLength = rawData[2];
 
+        messageBuilder.append("设备名称: ").append(sensorName).append("\n");
         messageBuilder.append("开始帧: ").append(String.format("%02X", startFrame)).append("\n");
         messageBuilder.append("硬件平台编号: ").append(String.format("%02X", hardwarePlatform)).append("\n");
         messageBuilder.append("数据长度: ").append(String.format("%02X", dataLength)).append("\n");
+        messageBuilder.append("设备编号: ").append(devEUI).append("\n");
 
         // 根据传感器类型解析具体数据
         switch (sensorName) {
@@ -438,7 +373,7 @@ public class TopologyTypeServiceImpl extends ServiceImpl<TopologyTypeMapper, Top
     /**
      * 字节数组转十六进制字符串
      */
-    public static String bytesToHex(byte[] bytes) {
+    public String bytesToHex(byte[] bytes) {
         StringBuffer sb = new StringBuffer();
         for(int i = 0; i < bytes.length; i++) {
             String hex = Integer.toHexString(bytes[i] & 0xFF);
