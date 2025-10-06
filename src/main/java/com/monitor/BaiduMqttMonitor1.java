@@ -45,7 +45,7 @@ public class BaiduMqttMonitor1 implements CommandLineRunner {
             MqttClient client = new MqttClient(broker, clientId);
             MqttConnectionOptions options = new MqttConnectionOptions();
             options.setUserName("thingidp@adtwuzp|industry-IOT010|0|MD5");
-            options.setPassword("744ca2312f7345963d1a18e2b1477b9b".getBytes());
+            options.setPassword("".getBytes());
             options.setAutomaticReconnect(true);
             options.setCleanStart(true);
 
